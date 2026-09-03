@@ -1,10 +1,14 @@
 name: Publikuj na GitHub Pages
 
+# Wymaga jednorazowego ustawienia w repo:
+#   Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+# Token workflow nie ma uprawnien admina, wiec nie moze wlaczyc Pages sam.
+
 on:
   push:
     branches:
-      - claude/free-subdomain-deployment-n00vxc
       - main
+      - claude/free-subdomain-deployment-n00vxc
   workflow_dispatch:
 
 permissions:
@@ -25,15 +29,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Zloz katalog do publikacji
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          cp index.html _site/
+          touch _site/.nojekyll
+          ls -la _site
+
       - name: Konfiguruj Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Spakuj strone
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Wdroz
         id: deployment
